@@ -48,6 +48,8 @@ DECLARE_EXFUNC(GetActionDict)
 
 DECLARE_EXFUNC(DictLoad)
 {
+    if (argc < 2) return OBJECT_NULL;
+    
     object_t filename = EXARG(0);
     if (OBJECT_TYPE(filename) != OBJECT_TYPE_STRING)
         return OBJECT_NULL;
@@ -81,6 +83,8 @@ DECLARE_EXFUNC(DictLoad)
 
 DECLARE_EXFUNC(DictSave)
 {
+    if (argc < 2) return OBJECT_NULL;
+
     object_t dict = EXARG(0);
     if (OBJECT_TYPE(dict) != OBJECT_TYPE_EXTERNAL ||
         dict->external.type != &external_type_dict)
@@ -104,6 +108,8 @@ DECLARE_EXFUNC(DictSave)
 
 DECLARE_EXFUNC(DictGet)
 {
+    if (argc < 3) return OBJECT_NULL;
+
     object_t dict = EXARG(0);
     object_t key  = EXARG(1);
     if (OBJECT_TYPE(dict) != OBJECT_TYPE_EXTERNAL ||
@@ -130,6 +136,8 @@ DECLARE_EXFUNC(DictGet)
 
 DECLARE_EXFUNC(DictPut)
 {
+    if (argc < 4) return OBJECT_NULL;
+        
     object_t dict  = EXARG(0);
     object_t key   = EXARG(1);
     object_t value = EXARG(2);
@@ -147,6 +155,8 @@ DECLARE_EXFUNC(DictPut)
 
 DECLARE_EXFUNC(DictDel)
 {
+    if (argc < 3) return OBJECT_NULL;
+
     object_t dict = EXARG(0);
     object_t key  = EXARG(1);
     if (OBJECT_TYPE(dict) != OBJECT_TYPE_EXTERNAL ||
@@ -162,6 +172,8 @@ DECLARE_EXFUNC(DictDel)
 
 DECLARE_EXFUNC(DictNextKey)
 {
+    if (argc < 3) return OBJECT_NULL;
+
     object_t dict   = EXARG(0);
     object_t key    = EXARG(1);
     object_t prefix = OBJECT_NULL;
@@ -171,7 +183,7 @@ DECLARE_EXFUNC(DictNextKey)
         dict->external.type != &external_type_dict)
         return OBJECT_NULL;
 
-    if (argc > 2 && OBJECT_TYPE(EXARG(2)) == OBJECT_TYPE_STRING)
+    if (argc > 3 && OBJECT_TYPE(EXARG(2)) == OBJECT_TYPE_STRING)
     {
         prefix = EXARG(2);
     }
@@ -207,6 +219,22 @@ WriteObject(object_t object, ostream &o)
         o << INT_UNBOX(object);
         break;
     }
+}
+
+DECLARE_EXFUNC(StringEqP)
+{
+    if (argc < 3)
+        return OBJECT_NULL;
+        
+    object_t a = EXARG(0);
+    object_t b = EXARG(1);
+    
+    if (OBJECT_TYPE(a) != OBJECT_TYPE_STRING ||
+        OBJECT_TYPE(b) != OBJECT_TYPE_STRING ||
+        !xstring_equal(a->string, b->string))
+        return OBJECT_FALSE;
+
+    return OBJECT_TRUE;
 }
 
 DECLARE_EXFUNC(ToString)
@@ -317,6 +345,8 @@ main(int argc, char **argv)
     se.ExternalFuncRegister("DictPut",  EXFUNC_DictPut, &se);
     se.ExternalFuncRegister("DictDel",  EXFUNC_DictDel, &se);
     se.ExternalFuncRegister("DictNextKey", EXFUNC_DictNextKey, &se);
+
+    se.ExternalFuncRegister("StringEq?", EXFUNC_StringEqP, &se);
     se.ExternalFuncRegister("ToString", EXFUNC_ToString, &se);
     se.ExternalFuncRegister("Debug",    EXFUNC_Debug, &se);
     se.ExternalFuncRegister("Output",   EXFUNC_Output, &se);
