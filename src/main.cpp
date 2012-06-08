@@ -4,11 +4,7 @@
 #include <sstream>
 #include <iostream>
 
-extern "C" {
-#include <vm/interp.h>
-}
-
-#include "script.hpp"
+#include <cpp_binding/script.hpp>
 #include "dict.hpp"
 
 using namespace std;
